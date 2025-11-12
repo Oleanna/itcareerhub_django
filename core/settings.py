@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'test_app.apps.TestAppConfig',
+    #'test_app.apps.TestAppConfig',
+    'task_manager.apps.TaskManagerConfig',
 ]
 
 MIDDLEWARE = [
@@ -99,7 +100,7 @@ else:
  DATABASES = {
      'default': {
            'ENGINE': 'django.db.backends.sqlite3',
-            'Name': BASE_DIR / 'db.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
      },
     }
 
