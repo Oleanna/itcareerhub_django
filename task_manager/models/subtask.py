@@ -1,7 +1,5 @@
 from django.utils import timezone
-
 from django.db import models
-
 from task_manager.enums import TaskStatus
 
 
