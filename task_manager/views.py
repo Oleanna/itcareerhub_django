@@ -1,8 +1,6 @@
-
 from rest_framework.decorators import api_view
-from rest_framework.response import Response
 from rest_framework.request import Request
-from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
 from django.utils import timezone
 from django.db.models import Count, Q
 
@@ -18,6 +16,34 @@ from rest_framework import status
 
 from task_manager.serializers.subtasks import SubTaskSerializer, SubTaskCreateSerializer
 
+WEEKDAYS = {
+    "sunday": 1,
+    "monday": 2,
+    "tuesday": 3,
+    "wednesday": 4,
+    "thursday": 5,
+    "friday": 6,
+    "saturday": 7,
+}
+
+class TaskByWeekday(APIView):
+    def get(self, request: Request):
+        weekday = request.query_params.get("weekday")
+        queryset = Task.objects.all()
+        if not weekday:
+            task_dto =TaskListSerializer(queryset, many=True)
+            return Response(task_dto.data, status=status.HTTP_200_OK)
+
+        weekday_param = weekday.lower()
+
+        if weekday_param not in WEEKDAYS:
+            return Response({"error": "Invalid weekday"}, status=status.HTTP_400_BAD_REQUEST)
+
+        target_weekday = WEEKDAYS[weekday_param]
+        queryset = queryset.filter(deadline__week_day=target_weekday)
+
+        task_dto = TaskListSerializer(queryset, many=True)
+        return Response(task_dto.data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def task_list(request: Request) -> Response:
@@ -103,11 +129,27 @@ def task_status(request: Request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
-class SubTaskListCreateView(APIView):
+
+
+class SubTaskListCreateView(APIView, PageNumberPagination):
+    page_size = 5
     def get(self, request):
-        subtasks = SubTask.objects.all()
-        subtasks_dto = SubTaskSerializer(subtasks, many=True)
-        return Response(subtasks_dto.data, status=status.HTTP_200_OK)
+        queryset = SubTask.objects.all().order_by("-created_at")
+
+        task_name = request.query_params.get("task_name")
+        status_param = request.query_params.get("status")
+
+        if task_name:
+            queryset = queryset.filter(task__title__icontains=task_name)
+
+        if status_param:
+            queryset = queryset.filter(status=status_param)
+
+        paginated_subtasks = self.paginate_queryset(queryset, request, view=self)
+        serializer = SubTaskSerializer(paginated_subtasks, many=True)
+
+        return self.get_paginated_response(serializer.data)
+
 
     def post(self, request):
         subtasks_dto = SubTaskCreateSerializer(data=request.data)

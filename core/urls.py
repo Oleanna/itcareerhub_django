@@ -25,7 +25,8 @@ from task_manager.views import (
     task_detail,
     task_status,
     SubTaskListCreateView,
-    SubTaskDetailUpdateDeleteView
+    SubTaskDetailUpdateDeleteView,
+    TaskByWeekday
 )
 
 
@@ -38,6 +39,8 @@ urlpatterns = [
     path('api/v1/tasks/<int:task_id>', task_detail),
     path('api/v1/tasks/status', task_status),
 
-    path("api/v1/subtasks", SubTaskListCreateView.as_view()),
-    path("api/v1/subtasks/<int:subtask_id>", SubTaskDetailUpdateDeleteView.as_view())
+    path("api/v1/subtasks/", SubTaskListCreateView.as_view()),
+    path("api/v1/subtasks/<int:subtask_id>", SubTaskDetailUpdateDeleteView.as_view()),
+
+    path('api/v2/tasks/', TaskByWeekday.as_view()),
 ]
