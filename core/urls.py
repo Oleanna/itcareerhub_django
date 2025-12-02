@@ -19,14 +19,20 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from task_manager.views import (
+from task_manager.views.tasks import (
     task_list,
     task_create,
     task_detail,
     task_status,
+    TaskByWeekday,
+    TaskListCreateView,
+    TaskDetailView,
+)
+from task_manager.views.subtasks import (
     SubTaskListCreateView,
     SubTaskDetailUpdateDeleteView,
-    TaskByWeekday
+    SubTaskListCreateAPIView,
+    SubTaskDetailAPIView
 )
 
 
@@ -42,5 +48,10 @@ urlpatterns = [
     path("api/v1/subtasks/", SubTaskListCreateView.as_view()),
     path("api/v1/subtasks/<int:subtask_id>", SubTaskDetailUpdateDeleteView.as_view()),
 
-    path('api/v2/tasks/', TaskByWeekday.as_view()),
+    path('api/v2/tasks/weekday/', TaskByWeekday.as_view()),
+    path("api/v2/tasks/", TaskListCreateView.as_view()),
+    path("api/v2/tasks/<int:id>/", TaskDetailView.as_view()),
+    path('api/v2/subtasks/', SubTaskListCreateAPIView.as_view()),
+    path('api/v2/subtasks/<int:pk>/', SubTaskDetailAPIView.as_view()),
+
 ]
