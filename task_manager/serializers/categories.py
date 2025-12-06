@@ -5,6 +5,8 @@ from task_manager.models import Category
 
 
 class CategoryCreateSerializer(serializers.ModelSerializer):
+    is_deleted = serializers.BooleanField(read_only=True)
+    deleted_at = serializers.DateTimeField(read_only=True)
     class Meta:
         model = Category
         fields = '__all__'
