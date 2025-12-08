@@ -16,6 +16,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+from paginators import OverrideCursorPaginator
+
 class TaskListCreateView(ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskListSerializer
@@ -41,6 +43,7 @@ class TaskListCreateView(ListCreateAPIView):
 class TaskDetailView(RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskDetailedSerializer
+    pagination_class = OverrideCursorPaginator
     lookup_field = "id"
 
 WEEKDAYS = {
@@ -54,6 +57,7 @@ WEEKDAYS = {
 }
 
 class TaskByWeekday(APIView):
+    pagination_class = OverrideCursorPaginator
     def get(self, request: Request):
         weekday = request.query_params.get("weekday")
         queryset = Task.objects.all()
