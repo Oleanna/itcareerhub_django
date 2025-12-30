@@ -19,7 +19,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 from task_manager.views.categories import CategoryViewSet
 from task_manager.views.tasks import (
     task_list,
@@ -45,13 +48,13 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
 
-    path('api/v1/tasks', task_list),
-    path('api/v1/tasks/create', task_create),
-    path('api/v1/tasks/<int:task_id>', task_detail),
-    path('api/v1/tasks/status', task_status),
+    path('api/v1/tasks/', task_list),
+    path('api/v1/tasks/create/', task_create),
+    path('api/v1/tasks/<int:task_id>/', task_detail),
+    path('api/v1/tasks/status/', task_status),
 
     path("api/v1/subtasks/", SubTaskListCreateView.as_view()),
-    path("api/v1/subtasks/<int:subtask_id>", SubTaskDetailUpdateDeleteView.as_view()),
+    path("api/v1/subtasks/<int:subtask_id>/", SubTaskDetailUpdateDeleteView.as_view()),
 
     path('api/v2/tasks/weekday/', TaskByWeekday.as_view()),
     path("api/v2/tasks/", TaskListCreateView.as_view()),
@@ -59,4 +62,6 @@ urlpatterns = [
     path('api/v2/subtasks/', SubTaskListCreateAPIView.as_view()),
     path('api/v2/subtasks/<int:pk>/', SubTaskDetailAPIView.as_view()),
 
+    path('api/v2/jwt-auth/', TokenObtainPairView.as_view()),
+    path('api/v2/jwt-refresh/', TokenRefreshView.as_view()),
 ]
