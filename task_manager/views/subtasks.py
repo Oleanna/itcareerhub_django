@@ -7,11 +7,14 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from task_manager.models import SubTask
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+
 
 
 class SubTaskListCreateAPIView(ListCreateAPIView):
     queryset = SubTask.objects.all()
     serializer_class = SubTaskSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
 
@@ -26,9 +29,11 @@ class SubTaskListCreateAPIView(ListCreateAPIView):
 class SubTaskDetailAPIView(RetrieveUpdateDestroyAPIView):
     queryset = SubTask.objects.all()
     serializer_class = SubTaskDetailSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class SubTaskListCreateView(APIView, PageNumberPagination):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     page_size = 5
     def get(self, request):
         queryset = SubTask.objects.all().order_by("-created_at")
@@ -57,6 +62,7 @@ class SubTaskListCreateView(APIView, PageNumberPagination):
 
 
 class SubTaskDetailUpdateDeleteView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     def get_object(self, subtask_id):
         try:
             return SubTask.objects.get(pk=subtask_id)

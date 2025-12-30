@@ -1,4 +1,4 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.request import Request
 from django.utils import timezone
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
@@ -15,12 +15,15 @@ from task_manager.serializers import (
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
+
 
 from paginators import OverrideCursorPaginator
 
 class TaskListCreateView(ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskListSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     filter_backends = [
         DjangoFilterBackend,
@@ -45,6 +48,7 @@ class TaskDetailView(RetrieveUpdateDestroyAPIView):
     serializer_class = TaskDetailedSerializer
     pagination_class = OverrideCursorPaginator
     lookup_field = "id"
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 WEEKDAYS = {
     "sunday": 1,
@@ -57,7 +61,7 @@ WEEKDAYS = {
 }
 
 class TaskByWeekday(APIView):
-    pagination_class = OverrideCursorPaginator
+    permission_classes = [IsAuthenticatedOrReadOnly]
     def get(self, request: Request):
         weekday = request.query_params.get("weekday")
         queryset = Task.objects.all()
@@ -77,6 +81,7 @@ class TaskByWeekday(APIView):
         return Response(task_dto.data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def task_list(request: Request) -> Response:
     tasks = Task.objects.all()
     tasks_dto = TaskListSerializer(tasks, many=True)
@@ -87,6 +92,7 @@ def task_list(request: Request) -> Response:
     )
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticatedOrReadOnly])
 def task_create(request: Request) -> Response:
     task_dto = TaskCreateSerializer(data=request.data)
 
@@ -113,6 +119,7 @@ def task_create(request: Request) -> Response:
     )
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def task_detail(request: Request, task_id: int) -> Response:
     try:
         task = Task.objects.get(pk=task_id)
@@ -129,6 +136,7 @@ def task_detail(request: Request, task_id: int) -> Response:
     )
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def task_status(request: Request):
     try:
         total_tasks = Task.objects.count()
