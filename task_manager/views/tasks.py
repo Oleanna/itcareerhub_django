@@ -18,6 +18,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 
 
+from paginators import OverrideCursorPaginator
+
 class TaskListCreateView(ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskListSerializer
@@ -44,6 +46,7 @@ class TaskListCreateView(ListCreateAPIView):
 class TaskDetailView(RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskDetailedSerializer
+    pagination_class = OverrideCursorPaginator
     lookup_field = "id"
     permission_classes = [IsAuthenticatedOrReadOnly]
 
