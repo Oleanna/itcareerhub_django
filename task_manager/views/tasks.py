@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.request import Request
 from django.utils import timezone
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from task_manager.serializers.tasks import TaskDetailedSerializer
@@ -15,7 +15,8 @@ from task_manager.serializers import (
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny, IsAuthenticated
+from task_manager.permissions.tasks import IsOwnerOrReadOnly
 
 
 from paginators import OverrideCursorPaginator
@@ -23,7 +24,7 @@ from paginators import OverrideCursorPaginator
 class TaskListCreateView(ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskListSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     filter_backends = [
         DjangoFilterBackend,
@@ -38,17 +39,27 @@ class TaskListCreateView(ListCreateAPIView):
     ordering_fields = ["created_at"]
     ordering = ["-created_at"]
 
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
     def get_serializer_class(self):
         if self.request.method == "POST":
             return TaskCreateSerializer
         return TaskListSerializer
+
+class MyTaskListView(ListAPIView):
+    serializer_class = TaskListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Task.objects.filter(owner=self.request.user)
 
 class TaskDetailView(RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskDetailedSerializer
     pagination_class = OverrideCursorPaginator
     lookup_field = "id"
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 WEEKDAYS = {
     "sunday": 1,
