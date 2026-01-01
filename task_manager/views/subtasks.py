@@ -2,6 +2,8 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
+from task_manager.permissions.tasks import IsOwnerOrReadOnly
 from task_manager.serializers.subtasks import SubTaskSerializer, SubTaskCreateSerializer, SubTaskDetailSerializer
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -14,7 +16,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 class SubTaskListCreateAPIView(ListCreateAPIView):
     queryset = SubTask.objects.all()
     serializer_class = SubTaskSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
 
@@ -25,11 +27,14 @@ class SubTaskListCreateAPIView(ListCreateAPIView):
     ordering_fields = ['created_at']
     ordering = ['created_at']
 
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
 
 class SubTaskDetailAPIView(RetrieveUpdateDestroyAPIView):
     queryset = SubTask.objects.all()
     serializer_class = SubTaskDetailSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
 class SubTaskListCreateView(APIView, PageNumberPagination):

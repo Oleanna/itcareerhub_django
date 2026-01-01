@@ -23,6 +23,8 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+
+from rest_framework import permissions
 from task_manager.views.categories import CategoryViewSet
 from task_manager.views.tasks import (
     task_list,
@@ -32,12 +34,26 @@ from task_manager.views.tasks import (
     TaskByWeekday,
     TaskListCreateView,
     TaskDetailView,
+    MyTaskListView,
 )
 from task_manager.views.subtasks import (
     SubTaskListCreateView,
     SubTaskDetailUpdateDeleteView,
     SubTaskListCreateAPIView,
     SubTaskDetailAPIView
+)
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title='Library Swagger',
+        default_version='v2',
+        description='API documentation',
+    ),
+    public=True,
+    permission_classes=[permissions.AllowAny],
+
 )
 
 router = DefaultRouter()
@@ -58,10 +74,15 @@ urlpatterns = [
 
     path('api/v2/tasks/weekday/', TaskByWeekday.as_view()),
     path("api/v2/tasks/", TaskListCreateView.as_view()),
+    path("api/v2/mytasks/", MyTaskListView.as_view()),
     path("api/v2/tasks/<int:id>/", TaskDetailView.as_view()),
     path('api/v2/subtasks/', SubTaskListCreateAPIView.as_view()),
     path('api/v2/subtasks/<int:pk>/', SubTaskDetailAPIView.as_view()),
 
     path('api/v2/jwt-auth/', TokenObtainPairView.as_view()),
     path('api/v2/jwt-refresh/', TokenRefreshView.as_view()),
+
+    path('swagger/', schema_view.with_ui('swagger')),
+    path('redoc/', schema_view.with_ui('redoc')),
+
 ]
