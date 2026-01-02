@@ -36,6 +36,7 @@ from task_manager.views.tasks import (
     TaskDetailView,
     MyTaskListView,
 )
+from task_manager.views.auth import RegisterView, LoginView, LogoutView, RefreshView
 from task_manager.views.subtasks import (
     SubTaskListCreateView,
     SubTaskDetailUpdateDeleteView,
@@ -81,6 +82,11 @@ urlpatterns = [
 
     path('api/v2/jwt-auth/', TokenObtainPairView.as_view()),
     path('api/v2/jwt-refresh/', TokenRefreshView.as_view()),
+
+    path("api/v2/auth/register/", RegisterView.as_view()),
+    path("api/v2/auth/login/", LoginView.as_view()),
+    path("api/v2/auth/refresh/", RefreshView.as_view()),
+    path("api/v2/auth/logout/", LogoutView.as_view()),
 
     path('swagger/', schema_view.with_ui('swagger')),
     path('redoc/', schema_view.with_ui('redoc')),
