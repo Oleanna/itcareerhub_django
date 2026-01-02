@@ -62,6 +62,9 @@ MIDDLEWARE = [
     #'custom_middleware.CustomMiddleware'
 ]
 
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "noreply@taskmanager.local"
+
 ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
