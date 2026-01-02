@@ -38,13 +38,6 @@ def notify_owner_on_status_change(
     if old_status == new_status:
         return
 
-    # if new_status == TaskStatus.done:
-    #     subject = "Task closed"
-    #     action_text = "has been closed"
-    # else:
-    #     subject = "Task status updated"
-    #     action_text = "status has been updated"
-
     message = (
         f"Hello {instance.owner.username},\n\n"
         f"Your task \"{instance.title}\" status has been updated.\n\n"
