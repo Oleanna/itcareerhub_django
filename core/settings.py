@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     "drf_yasg",
+    "rest_framework_simplejwt.token_blacklist",
 
     #'test_app.apps.TestAppConfig',
     'task_manager.apps.TaskManagerConfig',
@@ -141,6 +142,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
+        #"rest_framework.permissions.AllowAny",
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     #'DEFAULT_PAGINATION_CLASS': 'paginators.OverrideCursorPaginator',
@@ -153,6 +155,7 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
